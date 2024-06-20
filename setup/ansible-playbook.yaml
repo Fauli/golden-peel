@@ -1,0 +1,35 @@
+---
+- name: Install Nginx, Git, and Certbot
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      become: true
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+      become: true
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+      become: true
+
+    - name: Install Certbot
+      apt:
+        name: certbot
+        state: present
+      become: true
+
+    - name: Install Certbot Nginx Plugin
+      apt:
+        name: python3-certbot-nginx
+        state: present
+      become: true
+

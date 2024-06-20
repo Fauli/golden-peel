@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Interactive Banana Rain</title>
+<style>
+    body {
+        background-color: yellow;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden; /* Prevents scrollbars */
+        position: relative;
+    }
+    .banana {
+        position: fixed;
+        top: -60px; /* Start just above the screen */
+        font-size: 3em; /* Size of the falling bananas */
+        user-select: none; /* Prevents text selection */
+        animation: fall linear;
+    }
+    @keyframes fall {
+        from {
+            top: -50px; /* Start just above the screen */
+        }
+        to {
+            top: 100vh; /* End at the bottom of the viewport */
+        }
+    }
+    @keyframes flash {
+        0%   { background-color: red; }
+        25%  { background-color: blue; }
+        50%  { background-color: green; }
+        75%  { background-color: orange; }
+        100% { background-color: purple; }
+    }
+    .cool-text {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        text-align: center;
+        font-size: 2em;
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .flyer {
+        width: auto; /* Auto-width to maintain aspect ratio */
+        height: 50vh; /* 50% of the viewport height */
+        margin: 20px auto; /* Centering the flyer horizontally */
+        display: block;
+    }
+</style>
+<script>
+    function randomPosition() {
+        return Math.floor(Math.random() * (window.innerWidth - 50)) + 'px'; // Random horizontal position
+    }
+
+    function createBanana() {
+        const banana = document.createElement('div');
+        banana.textContent = '🍌';
+        banana.classList.add('banana');
+        banana.style.left = randomPosition();
+        banana.style.animationDuration = (Math.random() * 3 + 2) + 's'; // Random duration between 2s and 5s
+        document.body.appendChild(banana);
+
+        // Remove banana after it falls to prevent memory leak
+        setTimeout(() => {
+            document.body.removeChild(banana);
+        }, 5000);
+    }
+
+    setInterval(createBanana, 100); // Create a new banana every 100 milliseconds
+
+    function startFlashing() {
+        document.body.style.animation = 'flash 5s infinite';
+    }
+
+    window.onload = startFlashing;
+</script>
+</head>
+<body>
+<div class="cool-text">Be prepared for the unpreparable
+    <br />
+    <br />
+    You are invited by Dr. Bananas... to go bananas!</div>
+<img src="flyer1.jpeg" alt="Promotional Flyer" class="flyer">
+</body>
+</html>
