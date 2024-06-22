@@ -32,14 +32,12 @@
     .small-banana {
         position: absolute;
         font-size: 60px;
-        animation-name: fall;
         animation-timing-function: linear;
         animation-fill-mode: forwards;
     }
-    .spinning-banana {
-        animation-name: spin, fall; /* Add spin animation in addition to fall */
-        animation-timing-function: linear;
-        animation-fill-mode: forwards;
+    .random-spin {
+        animation-name: spin; /* Add spin animation */
+        animation-duration: 2s; /* Duration of spinning */
     }
     @keyframes fall {
         from { top: -10%; }
@@ -52,6 +50,18 @@
     @keyframes spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
+    }
+    @keyframes spin-reverse {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+    }
+    @keyframes slide-in {
+        0% { left: 100%; }
+        100% { left: 50%; }
+    }
+    @keyframes slide-out {
+        0% { left: -10%; }
+        100% { left: 50%; }
     }
 </style>
 </head>
@@ -80,21 +90,30 @@
         
         // Generate a random position across the width of the screen
         const xPos = Math.random() * window.innerWidth;
+        smallBanana.style.left = `${xPos}px`;
 
         // Set a random animation duration between 1 to 3 seconds
         const duration = Math.random() * 2 + 1; // Random duration from 1 to 3 seconds
-
-        smallBanana.style.left = `${xPos}px`;
         smallBanana.style.animationDuration = `${duration}s`;
 
-        // Every 100th banana spins
+        // Apply random spin direction
+        const spinDirection = Math.random() > 0.5 ? 'spin' : 'spin-reverse';
+        smallBanana.style.animationName = `${spinDirection}, fall`;
+
         if (bananaCount % 100 === 0) {
-            smallBanana.classList.add('spinning-banana');
+            smallBanana.style.top = '50%';
+            // Decide randomly to come from left or right
+            if (Math.random() < 0.5) {
+                smallBanana.style.animationName = 'slide-in';
+            } else {
+                smallBanana.style.animationName = 'slide-out';
+                smallBanana.style.left = '0';
+            }
         }
 
         document.body.appendChild(smallBanana);
 
-        // Remove the small banana after it completes falling
+        // Remove the small banana after it completes its animation
         setTimeout(() => {
             smallBanana.remove();
         }, duration * 1000); // Match the timeout with the animation duration
