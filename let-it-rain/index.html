@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Banana Click Game</title>
+<style>
+    body {
+        background-color: orange;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Aligns content vertically center */
+        align-items: center; /* Aligns content horizontally center */
+        position: relative;
+        overflow: hidden;
+    }
+    .counter {
+        font-size: 24px;
+        position: absolute;
+        top: 10%; /* Position the counter at the top inside the centered flex container */
+    }
+    .big-banana, .small-banana {
+        user-select: none; /* Prevent text selection */
+    }
+    .big-banana {
+        font-size: 180px; /* Large clickable banana */
+        cursor: pointer;
+        display: inline-block;
+        transition: transform 0.1s ease;
+    }
+    .small-banana {
+        position: absolute;
+        font-size: 60px;
+        animation-name: fall;
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+    }
+    .spinning-banana {
+        animation-name: spin, fall; /* Add spin animation in addition to fall */
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+    }
+    @keyframes fall {
+        from { top: -10%; }
+        to { top: 100%; }
+    }
+    @keyframes wiggle {
+        0%, 100% { transform: rotate(-10deg); }
+        50% { transform: rotate(10deg); }
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+<div class="counter">Bananas fallen: 0</div>
+<div class="big-banana">🍌</div>
+<script>
+    const bigBanana = document.querySelector('.big-banana');
+    const counterElement = document.querySelector('.counter');
+    let bananaCount = 0;
+
+    function activateBanana() {
+        // Increment and update the counter
+        bananaCount++;
+        counterElement.textContent = 'Bananas fallen: ' + bananaCount;
+
+        // Wiggle effect
+        bigBanana.style.animation = 'wiggle 0.5s ease';
+        bigBanana.addEventListener('animationend', () => {
+          bigBanana.style.animation = '';
+        });
+
+        const smallBanana = document.createElement('div');
+        smallBanana.classList.add('small-banana');
+        smallBanana.textContent = '🍌';
+        
+        // Generate a random position across the width of the screen
+        const xPos = Math.random() * window.innerWidth;
+
+        // Set a random animation duration between 1 to 3 seconds
+        const duration = Math.random() * 2 + 1; // Random duration from 1 to 3 seconds
+
+        smallBanana.style.left = `${xPos}px`;
+        smallBanana.style.animationDuration = `${duration}s`;
+
+        // Every 100th banana spins
+        if (bananaCount % 100 === 0) {
+            smallBanana.classList.add('spinning-banana');
+        }
+
+        document.body.appendChild(smallBanana);
+
+        // Remove the small banana after it completes falling
+        setTimeout(() => {
+            smallBanana.remove();
+        }, duration * 1000); // Match the timeout with the animation duration
+    }
+
+    bigBanana.onclick = activateBanana;
+
+    document.body.addEventListener('keydown', function(event) {
+        if (event.code === 'Space') {
+            event.preventDefault(); // Prevent the default action (scroll down)
+            activateBanana();
+        }
+    });
+</script>
+</body>
+</html>

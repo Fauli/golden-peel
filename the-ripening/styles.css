@@ -1,0 +1,25 @@
+body {
+    background-color: orange;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+#banana {
+    font-size: 120px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+#counter {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
