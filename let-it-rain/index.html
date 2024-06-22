@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>banAmen: Help the Banana find it's center</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
 <style>
     body {
         background-color: orange;
@@ -16,10 +20,19 @@
         overflow: hidden;
     }
     .counter {
-        font-size: 24px;
+        font-size: 50px;
+        font-weight: bold;
         position: absolute;
         top: 10%; /* Position the counter at the top inside the centered flex container */
-        font-family: 'Courier New', Courier, monospace;
+        font-family: "Amatic SC";
+        /* font-family: 'Permanent Marker', cursive; */
+    }
+    .message {
+        font-size: 60px;
+        /* color: #ffffff;  */
+        visibility: hidden; /* Initially hide the text */
+        font-family: "Amatic SC";
+        user-select: none; /* Prevent text selection */
     }
     .big-banana, .small-banana {
         user-select: none; /* Prevent text selection */
@@ -65,13 +78,6 @@
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.5); }
     }
-    .message {
-        font-size: 30px;
-        color: #ffffff; /* White text color */
-        visibility: hidden; /* Initially hide the text */
-        font-family: 'Courier New', Courier, monospace;
-        user-select: none; /* Prevent text selection */
-    }
 </style>
 </head>
 <body>
@@ -111,7 +117,7 @@
         const spinDirection = Math.random() > 0.5 ? 'spin' : 'spin-reverse';
         smallBanana.style.animationName = `${spinDirection}, fall`;
 
-        if (bananaCount % 137 === 0) {
+        if (bananaCount % 10 === 0) {
             smallBanana.style.top = '50%';
             // Decide randomly to come from left or right
             smallBanana.style.animationDuration = '2s';
