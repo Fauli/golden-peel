@@ -19,6 +19,7 @@
         font-size: 24px;
         position: absolute;
         top: 10%; /* Position the counter at the top inside the centered flex container */
+        font-family: 'Courier New', Courier, monospace;
     }
     .big-banana, .small-banana {
         user-select: none; /* Prevent text selection */
@@ -28,16 +29,13 @@
         cursor: pointer;
         display: inline-block;
         transition: transform 0.1s ease;
+        animation-fill-mode: forwards;
     }
     .small-banana {
         position: absolute;
         font-size: 60px;
         animation-timing-function: linear;
         animation-fill-mode: forwards;
-    }
-    .random-spin {
-        animation-name: spin; /* Add spin animation */
-        animation-duration: 2s; /* Duration of spinning */
     }
     @keyframes fall {
         from { top: -10%; }
@@ -63,14 +61,26 @@
         0% { left: -10%; }
         100% { left: 50%; }
     }
+    @keyframes grow-shrink {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.5); }
+    }
+    .message {
+        font-size: 30px;
+        color: #ffffff; /* White text color */
+        visibility: hidden; /* Initially hide the text */
+        font-family: 'Courier New', Courier, monospace;
+    }
 </style>
 </head>
 <body>
 <div class="counter">Bananas fallen: 0</div>
 <div class="big-banana">🍌</div>
+<div class="message">banAmen!</div>
 <script>
     const bigBanana = document.querySelector('.big-banana');
     const counterElement = document.querySelector('.counter');
+    const messageElement = document.querySelector('.message');
     let bananaCount = 0;
 
     function activateBanana() {
@@ -93,22 +103,30 @@
         smallBanana.style.left = `${xPos}px`;
 
         // Set a random animation duration between 1 to 3 seconds
-        const duration = Math.random() * 2 + 1; // Random duration from 1 to 3 seconds
+        var duration = Math.random() * 2 + 1; // Random duration from 1 to 3 seconds
         smallBanana.style.animationDuration = `${duration}s`;
 
         // Apply random spin direction
         const spinDirection = Math.random() > 0.5 ? 'spin' : 'spin-reverse';
         smallBanana.style.animationName = `${spinDirection}, fall`;
 
-        if (bananaCount % 100 === 0) {
+        if (bananaCount % 10 === 0) {
             smallBanana.style.top = '50%';
             // Decide randomly to come from left or right
-            if (Math.random() < 0.5) {
-                smallBanana.style.animationName = 'slide-in';
-            } else {
-                smallBanana.style.animationName = 'slide-out';
-                smallBanana.style.left = '0';
-            }
+            smallBanana.style.animationDuration = '2s';
+            duration = 2;
+            const slideAnimation = Math.random() < 0.5 ? 'slide-in' : 'slide-out';
+            smallBanana.style.animationName = slideAnimation;
+            smallBanana.style.left = slideAnimation === 'slide-in' ? '100%' : '-10%';
+            setTimeout(() => {
+                bigBanana.style.animation = 'grow-shrink 1s ease';
+                bigBanana.addEventListener('animationend', () => {
+                    messageElement.style.visibility = 'visible'; // Show the message when the animation ends
+                }, { once: true });
+            }, 1800); // Trigger grow-shrink animation when the 100th banana reaches the center
+            setTimeout(() => {
+                messageElement.style.visibility = 'hidden'; // Hide the message after 2 seconds
+            }, 4800); // Hide the message after 2 seconds
         }
 
         document.body.appendChild(smallBanana);
