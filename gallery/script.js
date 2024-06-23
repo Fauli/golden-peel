@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     for (let i = 1; i <= 24; i++) {
         const img = document.createElement('img');
-        img.src = `Images/Banana-Candles-${i}.webp`;
+        img.src = `images/Banana-Candles-${i}.webp`;
         img.alt = `Banana Candles ${i}`;
         gallery.appendChild(img);
 
