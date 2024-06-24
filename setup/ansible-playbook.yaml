@@ -2,6 +2,9 @@
 - name: Install Nginx, Git, and Certbot
   hosts: localhost
   become: true
+  vars:
+    installPath: "/root/golden-peel-repo" # TODO: switch to a proper use and path
+
 
   tasks:
     - name: Update apt cache
@@ -14,6 +17,9 @@
         name: nginx
         state: present
       become: true
+
+    - name: Open firewall
+      ansible.builtin.shell: ufw allow 'Nginx HTTP'
 
     - name: Install Git
       apt:
@@ -32,4 +38,13 @@
         name: python3-certbot-nginx
         state: present
       become: true
+
+    - name: Git checkout of banague repo
+      ansible.builtin.git:
+        repo: "//github.com/Fauli/golden-peel.git"
+        dest: "{{installPath}}"
+
+    - name: Copy checked out contents to /var/www/html
+      ansible.builtin.shell: cp -r {{installPath}}/* /var/www/html
+
 
