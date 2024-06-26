@@ -99,23 +99,39 @@
     const bigBanana = document.querySelector('.big-banana');
     const counterElement = document.querySelector('.counter');
     const messageElement = document.querySelector('.message');
-    let bananaCount = 0;
+
+    // check if we reset the counter, otherwise start from the last count
+    const queryString = window.location.search;
+    console.log(queryString);
+    const urlParams = new URLSearchParams(queryString);
+    const reset = urlParams.get('reset')
+    console.log(reset);
+    if (reset == 'true') {
+        localStorage.removeItem("count");
+        bananaCount = 0;
+        counterElement.textContent = 'Bananas fallen: ' + bananaCount;
+    }
+
+    // Load the count from local storage
+    bananaCount = parseInt(localStorage.getItem("count")) || 0;
+    counterElement.textContent = 'Bananas fallen: ' + bananaCount;
 
     function activateBanana() {
         // Increment and update the counter
         bananaCount++;
+        localStorage.setItem("count", bananaCount);
         counterElement.textContent = 'Bananas fallen: ' + bananaCount;
 
         // Wiggle effect
         bigBanana.style.animation = 'wiggle 0.5s ease';
         bigBanana.addEventListener('animationend', () => {
-          bigBanana.style.animation = '';
+            bigBanana.style.animation = '';
         });
 
         const smallBanana = document.createElement('div');
         smallBanana.classList.add('small-banana');
         smallBanana.textContent = '🍌';
-        
+
         // Generate a random position across the width of the screen
         const xPos = Math.random() * window.innerWidth;
         smallBanana.style.left = `${xPos}px`;
@@ -159,12 +175,15 @@
 
     bigBanana.onclick = activateBanana;
 
-    document.body.addEventListener('keydown', function(event) {
+    document.body.addEventListener('keydown', function (event) {
         if (event.code === 'Space') {
             event.preventDefault(); // Prevent the default action (scroll down)
             activateBanana();
         }
     });
+
+
+
 </script>
 </body>
 </html>
