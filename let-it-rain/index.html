@@ -141,6 +141,8 @@
                 bigBanana.addEventListener('animationend', () => {
                     messageElement.style.visibility = 'visible'; // Show the message when the animation ends
                 }, { once: true });
+                var audio = new Audio('banAmen.mp3');
+                audio.play();
             }, 1800); // Trigger grow-shrink animation when the 100th banana reaches the center
             setTimeout(() => {
                 messageElement.style.visibility = 'hidden'; // Hide the message after 2 seconds
