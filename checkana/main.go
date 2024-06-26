@@ -2,16 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool)       // connected clients
-var broadcast = make(chan []int)                   // broadcast channel for the numbers slice
-var numbers = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10} // initial slice of numbers
+var clients = make(map[*websocket.Conn]bool) // connected clients
+var broadcast = make(chan Cell)              // broadcast channel for the numbers slice
+var cells = []Cell{}                         // initial slice of numbers
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -25,6 +25,8 @@ type Cell struct {
 }
 
 func main() {
+
+	cells = initialize10000Cells()
 
 	http.HandleFunc("/ws", handleConnections)
 	http.Handle("/", http.FileServer(http.Dir("./grid")))
@@ -58,12 +60,14 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		// Convert message to an integer and add to slice
-		newNumber, err := strconv.Atoi(string(message))
+		cell := Cell{}
+		err = json.Unmarshal(message, &cell)
+		fmt.Println("Received", cell)
 		if err != nil {
 			log.Printf("error: invalid number received %v", err)
 		} else {
-			numbers = append(numbers, newNumber)
-			broadcast <- numbers
+			flipCellWithId(cell.CellID)
+			broadcast <- cell
 		}
 	}
 }
@@ -72,6 +76,7 @@ func handleMessages() {
 	for {
 		updatedNumbers := <-broadcast
 		numbersJSON, err := json.Marshal(updatedNumbers)
+		fmt.Println("Broadcasting", updatedNumbers)
 		if err != nil {
 			log.Printf("Error marshaling numbers: %v", err)
 			continue
@@ -89,10 +94,29 @@ func handleMessages() {
 
 // Helper function to send the current slice of numbers to a specific WebSocket client
 func sendNumbers(ws *websocket.Conn) {
-	numbersJSON, err := json.Marshal(numbers)
+	numbersJSON, err := json.Marshal(cells)
 	if err != nil {
 		log.Println("Error encoding slice of numbers:", err)
 		return
 	}
 	ws.WriteMessage(websocket.TextMessage, numbersJSON)
+}
+
+func initialize10000Cells() []Cell {
+	for i := 0; i < 10000; i++ {
+		cells = append(cells, Cell{CellID: i, State: "🍌"})
+	}
+	return cells
+}
+
+func flipCellWithId(id int) {
+	for i, cell := range cells {
+		if cell.CellID == id {
+			if cell.State == "🍌" {
+				cells[i].State = "🍎"
+			} else {
+				cells[i].State = "🍌"
+			}
+		}
+	}
 }
