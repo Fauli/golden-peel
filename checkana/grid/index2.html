@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Heart Toggle</title>
+    <style>
+        body {
+            background-color: #f7e9a0; /* Light yellow background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: auto; /* Allows scrolling */
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(100, 30px); /* 100 columns */
+            grid-gap: 2px;
+            user-select: none; /* Prevents text selection */
+        }
+        .emoji {
+            font-size: 1.5rem; /* Adjust font size for visibility */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px; /* Height for each cell */
+            width: 30px; /* Width for each cell */
+        }
+    </style>
+</head>
+<body>
+    <div id="grid"></div>
+
+    <script>
+        const gridSize = 100; // Large grid size
+        const grid = document.getElementById('grid');
+        let socket;
+
+        // Function to create the grid
+        function createGrid(emojis) {
+            grid.innerHTML = ''; // Clear the grid first
+            emojis.forEach((emoji, i) => {
+                const cell = document.createElement('div');
+                cell.classList.add('emoji');
+                cell.id = 'cell' + i; // Assign unique ID for each cell
+                cell.textContent = emoji; // Set from initial state
+                cell.onclick = function() {
+                    const newState = (cell.textContent === '🍌') ? '💛' : '🍌';
+                    cell.textContent = newState;
+                    socket.send(JSON.stringify({ cell: i, state: newState })); // Send state change to the server
+                };
+                grid.appendChild(cell);
+            });
+        }
+
+        // Fetch initial state from backend
+        // fetch('/checkana')
+        fetch('checkana.json')
+            .then(response => response.json())
+            .then(data => {
+                createGrid(data.emojis); // Initialize the grid with server data
+                // Connect to WebSocket
+                socket = new WebSocket('ws://localhost:8000/ws'); // Adjust URL for your WebSocket
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    const cell = document.getElementById('cell' + data.cell);
+                    if (cell) {
+                        cell.textContent = data.state;
+                        // Optionally do more here if you need to handle more complex updates
+                    }
+                };
+            })
+            .catch(error => console.error('Failed to load initial grid state:', error));
+
+    </script>
+</body>
+</html>
+
+
+
+Ok so the idea is that we have a grid of emojis, and each emoji can be toggled between a banana (🍌) and a heart (💛) by clicking on it. 
+The state of each emoji is sent to the websocket, and the server will broadcast the updated state to all connected clients.
+if the site receives a message form the websocket it will update the emoji in the grid to the new state.
