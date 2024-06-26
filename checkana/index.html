@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Heart Toggle</title>
+    <style>
+        body {
+            background-color: #f7e9a0; /* Light yellow background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: auto; /* Allows scrolling */
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(100, 30px); /* 100 columns */
+            grid-gap: 2px;
+            user-select: none; /* Prevents text selection */
+        }
+        .emoji {
+            font-size: 1.5rem; /* Adjust font size for visibility */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px; /* Height for each cell */
+            width: 30px; /* Width for each cell */
+        }
+    </style>
+</head>
+<body>
+    <div id="grid"></div>
+
+    <script>
+        const gridSize = 100; // Large grid size
+        const grid = document.getElementById('grid');
+
+        // Function to create the grid
+        function createGrid(size) {
+            grid.innerHTML = ''; // Clear the grid first
+            for (let i = 0; i < size * size; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('emoji');
+                cell.id = 'cell' + i; // Assign unique ID for each cell
+                cell.textContent = localStorage.getItem('cell' + i) || '🍌'; // Restore state or default to banana
+                cell.onclick = function() {
+                    cell.textContent = (cell.textContent === '🍌') ? '👁️' : '🍌';
+                    localStorage.setItem('cell' + i, cell.textContent); // Save state to local storage
+                };
+                grid.appendChild(cell);
+            }
+        }
+
+        createGrid(gridSize); // Initialize the grid
+    </script>
+</body>
+</html>
