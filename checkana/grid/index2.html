@@ -8,10 +8,11 @@
         body {
             background-color: #f7e9a0; /* Light yellow background */
             display: flex;
-            justify-content: center;
+            /* justify-content: center; */
             align-items: center;
             height: 100vh;
-            margin: 0;
+            padding: 40px;
+            padding-left: 5px;
             overflow: auto; /* Allows scrolling */
         }
         #grid {
@@ -58,12 +59,12 @@
 
         // Fetch initial state from backend
         // fetch('/checkana')
-        fetch('checkana.json')
+        fetch('/initial')
             .then(response => response.json())
             .then(data => {
                 createGrid(data.emojis); // Initialize the grid with server data
                 // Connect to WebSocket
-                socket = new WebSocket('ws://localhost:8000/ws'); // Adjust URL for your WebSocket
+                socket = new WebSocket('ws://localhost:9000/ws'); // Adjust URL for your WebSocket
                 socket.onmessage = function(event) {
                     console.log('Received message:', event.data)
                     const data = JSON.parse(event.data);

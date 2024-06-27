@@ -24,17 +24,22 @@ type Cell struct {
 	State  string `json:"state"`
 }
 
+type Emojis struct {
+	Emojis []string `json:"emojis"`
+}
+
 func main() {
 
 	cells = initialize10000Cells()
 
 	http.HandleFunc("/ws", handleConnections)
 	http.Handle("/", http.FileServer(http.Dir("./grid")))
+	http.Handle("/initial", handleInitial())
 
 	go handleMessages()
 
-	log.Println("HTTP server started on :8000")
-	err := http.ListenAndServe("localhost:8000", nil)
+	log.Println("HTTP server started on :9000")
+	err := http.ListenAndServe("localhost:9000", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -66,7 +71,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("error: invalid number received %v", err)
 		} else {
-			flipCellWithId(cell.CellID)
+			// flipCellWithId(cell.CellID)
+			setCellWithId(cell.CellID, cell.State)
 			broadcast <- cell
 		}
 	}
@@ -113,10 +119,33 @@ func flipCellWithId(id int) {
 	for i, cell := range cells {
 		if cell.CellID == id {
 			if cell.State == "🍌" {
-				cells[i].State = "🍎"
+				cells[i].State = "👁️"
 			} else {
 				cells[i].State = "🍌"
 			}
 		}
 	}
+}
+
+func setCellWithId(id int, state string) {
+	for i, cell := range cells {
+		if cell.CellID == id {
+			cells[i].State = state
+		}
+	}
+}
+
+func handleInitial() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(Emojis{Emojis: cellsToEmojis(cells)})
+	})
+}
+
+func cellsToEmojis(cells []Cell) []string {
+	emojis := []string{}
+	for _, cell := range cells {
+		emojis = append(emojis, cell.State)
+	}
+	return emojis
 }
