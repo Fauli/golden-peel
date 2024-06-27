@@ -30,7 +30,7 @@ type Emojis struct {
 
 func main() {
 
-	cells = initialize10000Cells()
+	cells = initializeCells(10000)
 
 	http.HandleFunc("/ws", handleConnections)
 	http.Handle("/", http.FileServer(http.Dir("./grid")))
@@ -108,8 +108,8 @@ func sendCells(ws *websocket.Conn) {
 	ws.WriteMessage(websocket.TextMessage, numbersJSON)
 }
 
-func initialize10000Cells() []Cell {
-	for i := 0; i < 10000; i++ {
+func initializeCells(count int) []Cell {
+	for i := 0; i < count; i++ {
 		cells = append(cells, Cell{CellID: i, State: "🍌"})
 	}
 	return cells
