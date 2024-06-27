@@ -54,8 +54,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	clients[ws] = true
 
-	// Send the initial slice of numbers to the client upon connection
-	sendNumbers(ws)
+	// Send the initial slice of cells to the client upon connection
+	sendCells(ws)
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -64,7 +64,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			delete(clients, ws)
 			break
 		}
-		// Convert message to an integer and add to slice
+		// Convert message to cell, set it, and send it to all clients
 		cell := Cell{}
 		err = json.Unmarshal(message, &cell)
 		fmt.Println("Received", cell)
@@ -98,8 +98,8 @@ func handleMessages() {
 	}
 }
 
-// Helper function to send the current slice of numbers to a specific WebSocket client
-func sendNumbers(ws *websocket.Conn) {
+// Helper function to send the updated cell
+func sendCells(ws *websocket.Conn) {
 	numbersJSON, err := json.Marshal(cells)
 	if err != nil {
 		log.Println("Error encoding slice of numbers:", err)
@@ -115,17 +115,17 @@ func initialize10000Cells() []Cell {
 	return cells
 }
 
-func flipCellWithId(id int) {
-	for i, cell := range cells {
-		if cell.CellID == id {
-			if cell.State == "🍌" {
-				cells[i].State = "👁️"
-			} else {
-				cells[i].State = "🍌"
-			}
-		}
-	}
-}
+// func flipCellWithId(id int) {
+// 	for i, cell := range cells {
+// 		if cell.CellID == id {
+// 			if cell.State == "🍌" {
+// 				cells[i].State = "👁️"
+// 			} else {
+// 				cells[i].State = "🍌"
+// 			}
+// 		}
+// 	}
+// }
 
 func setCellWithId(id int, state string) {
 	for i, cell := range cells {
