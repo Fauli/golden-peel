@@ -1,0 +1,14 @@
+[Unit]
+Description=Checkana Banana
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/root/golden-peel/checkana/checkana
+WorkingDirectory=/root/golden-peel/checkana
+
+[Install]
+WantedBy=multi-user.target

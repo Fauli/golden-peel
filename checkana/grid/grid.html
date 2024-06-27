@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banana Heart Toggle</title>
+    <title>BANANAAAZ: I see dead BANANAZ</title>
     <style>
         html, 
         body {
@@ -37,6 +37,8 @@
     <div id="grid"></div>
 
     <script>
+        const wsHost = window.location.origin.replace(/^http/, 'ws');
+        console.log('Connecting to WebSocket at', wsHost);
         const gridSize = 100; // Large grid size
         const grid = document.getElementById('grid');
         let socket;
@@ -65,7 +67,7 @@
             .then(data => {
                 createGrid(data.emojis); // Initialize the grid with server data
                 // Connect to WebSocket
-                socket = new WebSocket('ws://localhost:9000/ws'); // Adjust URL for your WebSocket
+                socket = new WebSocket(wsHost+'/ws'); // Adjust URL for your WebSocket
                 socket.onmessage = function(event) {
                     console.log('Received message:', event.data)
                     const data = JSON.parse(event.data);
