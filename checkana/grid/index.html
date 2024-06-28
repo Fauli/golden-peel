@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANANAAAZ: I see dead BANANAZ</title>
+    <style>
+        html {
+            background-color: #f7e9a0; /* Light yellow background */
+            display: flex;
+            flex-direction: column; /* Changed to column for vertical layout */
+            align-items: center;
+            height: 100vh;
+            padding: 0px;
+            overflow: hidden;
+        }
+        body {
+            overflow: auto; /* Allows scrolling */
+            width: 100%; /* Full width */
+            padding-bottom: 50px; /* Padding to avoid overlap with emoji selector */
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(100, 30px); /* 100 columns */
+            grid-gap: 2px;
+            user-select: none; /* Prevents text selection */
+        }
+        #emoji-selector {
+            position: fixed; /* Fixed positioning */
+            bottom: 0; /* At the bottom of the viewport */
+            width: 100%; /* Full width */
+            display: flex;
+            justify-content: center;
+            background-color: #000; /* Background color for visibility */
+        }
+        .emoji {
+            font-size: 1.5rem; /* Adjust font size for visibility */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px; /* Height for each cell */
+            width: 30px; /* Width for each cell */
+            transition: transform 0.3s ease; /* Smooth transform on select */
+        }
+        .selected {
+            transform: scale(1.2); /* Scale up the selected emoji */
+            border: 2px solid blue; /* Highlight selected emoji */
+        }
+    </style>
+</head>
+<body>
+    <div id="grid"></div>
+    <div id="emoji-selector">
+        <div class="emoji selected">👁️</div>
+        <div class="emoji">💙</div>
+        <div class="emoji">👻</div>
+        <div class="emoji">🐱</div>
+        <div class="emoji">⭐️</div>
+        <div class="emoji">🥰</div>
+        <div class="emoji">🦋</div>
+        <div class="emoji">💋</div>
+
+    </div>
+
+    <script>
+        const wsHost = window.location.origin.replace(/^http/, 'ws');
+        const gridSize = 100;
+        const grid = document.getElementById('grid');
+        const emojiSelector = document.getElementById('emoji-selector');
+        let socket;
+        let currentEmoji = '👁️'; // Default emoji set to eye
+
+        function createGrid(emojis) {
+            grid.innerHTML = '';
+            emojis.forEach((emoji, i) => {
+                const cell = document.createElement('div');
+                cell.classList.add('emoji');
+                cell.id = 'cell' + i;
+                cell.textContent = emoji;
+                cell.onclick = function() {
+                    cell.textContent = (cell.textContent === '🍌') ? currentEmoji : '🍌';
+                    socket.send(JSON.stringify({ cell: i, state: cell.textContent }));
+                };
+                grid.appendChild(cell);
+            });
+        }
+
+        emojiSelector.querySelectorAll('.emoji').forEach(emoji => {
+            emoji.onclick = function() {
+                document.querySelector('.selected')?.classList.remove('selected'); // Remove current selection
+                emoji.classList.add('selected'); // Mark new emoji as selected
+                currentEmoji = emoji.textContent; // Update current emoji on click
+            };
+        });
+
+        fetch('/initial')
+            .then(response => response.json())
+            .then(data => {
+                createGrid(data.emojis);
+                socket = new WebSocket(wsHost+'/ws');
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    const cell = document.getElementById('cell' + data.cell);
+                    if (cell) {
+                        cell.textContent = data.state;
+                    }
+                };
+            })
+            .catch(error => console.error('Failed to load initial grid state:', error));
+    </script>
+</body>
+</html>
