@@ -30,6 +30,7 @@ type Emojis struct {
 
 func main() {
 
+	// WE NEED A LOT OF BANANAS!!
 	cells = initializeCells(10000)
 
 	http.HandleFunc("/ws", handleConnections)
@@ -45,6 +46,7 @@ func main() {
 	}
 }
 
+// handleConnections upgrades the HTTP connection to a WebSocket connection
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -52,6 +54,7 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
+	// Keep track of them clients! :)
 	clients[ws] = true
 
 	// Send the initial slice of cells to the client upon connection
@@ -71,13 +74,17 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Printf("error: invalid number received %v", err)
 		} else {
-			// flipCellWithId(cell.CellID)
-			setCellWithId(cell.CellID, cell.State)
-			broadcast <- cell
+			if len(cell.State) == 1 {
+				setCellWithId(cell.CellID, cell.State)
+				broadcast <- cell
+			} else {
+				log.Printf("error: invalid state received [%v], will ignore", err)
+			}
 		}
 	}
 }
 
+// handleMessages broadcasts the updated numbers to all connected clients
 func handleMessages() {
 	for {
 		updatedNumbers := <-broadcast
@@ -108,6 +115,7 @@ func sendCells(ws *websocket.Conn) {
 	ws.WriteMessage(websocket.TextMessage, numbersJSON)
 }
 
+// initializeCells creates a slice of cells of BANANAS with the given count
 func initializeCells(count int) []Cell {
 	for i := 0; i < count; i++ {
 		cells = append(cells, Cell{CellID: i, State: "🍌"})
@@ -115,18 +123,7 @@ func initializeCells(count int) []Cell {
 	return cells
 }
 
-// func flipCellWithId(id int) {
-// 	for i, cell := range cells {
-// 		if cell.CellID == id {
-// 			if cell.State == "🍌" {
-// 				cells[i].State = "👁️"
-// 			} else {
-// 				cells[i].State = "🍌"
-// 			}
-// 		}
-// 	}
-// }
-
+// TODO: [franz] This is like... totally secure and stuff :P
 func setCellWithId(id int, state string) {
 	for i, cell := range cells {
 		if cell.CellID == id {
@@ -135,6 +132,7 @@ func setCellWithId(id int, state string) {
 	}
 }
 
+// handleInitial returns the initial state of the grid
 func handleInitial() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -142,6 +140,8 @@ func handleInitial() http.Handler {
 	})
 }
 
+// cellsToEmojis converts a slice of cells to a slice of emojis
+// TODO: [franz] This is a bit of a hack, but it works for now
 func cellsToEmojis(cells []Cell) []string {
 	emojis := []string{}
 	for _, cell := range cells {
